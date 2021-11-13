@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QComboBox, QVBoxLayout, QPushButton
 
-from scripts.available_algos import AVAILABLE_ALGOS
+from scripts.available_tools import AVAILABLE_TOOLS
 
 
 class ScriptSelector(QWidget):
@@ -9,7 +9,7 @@ class ScriptSelector(QWidget):
 
         layout = QVBoxLayout()
         self.script_cb = QComboBox()
-        self.script_cb.addItems(AVAILABLE_ALGOS.keys())
+        self.script_cb.addItems(AVAILABLE_TOOLS.keys())
 
         self.duration_cb = QComboBox()
         self.duration_cb.addItems(map(lambda i: str(i) + "h", durations))
@@ -27,6 +27,6 @@ class ScriptSelector(QWidget):
 
     def start(self) -> None:
         self.selected_duration = float(self.duration_cb.currentText()[:-1]) * 3600  # Hour -> second
-        self.selected_script = AVAILABLE_ALGOS[self.script_cb.currentText()]
+        self.selected_script = AVAILABLE_TOOLS[self.script_cb.currentText()]
 
         self.close()
