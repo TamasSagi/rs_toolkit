@@ -6,10 +6,11 @@ from collections import deque
 
 class Timer:
     def __init__(self, queue_size=30) -> None:
-        self.start_time = time.time()
+        self.start_time = time.perf_counter()
         self.measure_start = 0.0
         self.update_times = deque([0.33], maxlen=queue_size)
 
+    # TODO: type hint
     @staticmethod
     def timeit(func):
         def wrapper(*args, **kwargs):
@@ -29,13 +30,13 @@ class Timer:
         return time.strftime("%H:%M:%S", time.gmtime(int(self.get_elapsed_time())))
 
     def get_elapsed_time(self) -> float:
-        return time.time() - self.start_time
+        return time.perf_counter() - self.start_time
 
     def get_avg_time(self) -> float:
         return (sum(self.update_times) / len(self.update_times)) * 1000.0  # [ms]
 
-    def start(self):
-        self.measure_start = time.time()
+    def start(self) -> None:
+        self.measure_start = time.perf_counter()
 
-    def end(self):
-        self.update_times.append(time.time() - self.measure_start)
+    def end(self) -> None:
+        self.update_times.append(time.perf_counter() - self.measure_start)
