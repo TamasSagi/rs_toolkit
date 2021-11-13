@@ -2,11 +2,15 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPainter, QPaintEvent
 from PyQt5.QtWidgets import QWidget, QMainWindow
 
+from scripts.timer import Timer
+
 
 class TransparenWindow(QMainWindow):
     def __init__(self, screen_width: int, screen_height: int, drawables: dict) -> None:
         super().__init__()
         self.drawables = drawables
+
+        self.timer = Timer()
         self.resize(screen_width, screen_height)
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
@@ -19,6 +23,7 @@ class TransparenWindow(QMainWindow):
         self.setAttribute(Qt.WA_NoChildEventsForParent, True)
         self.setWindowFlags(flags)
 
+    @Timer.timeit
     def paintEvent(self, event: QPaintEvent) -> None:
         self.central_widget.painter = QPainter()
         self.central_widget.painter.begin(self)
