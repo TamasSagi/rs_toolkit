@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
-from PyQt5.QtGui import QPainter, QPen, QColor
+from PyQt5.QtGui import QPainter, QPen, QColor, QImage
+from Xlib.xobject import drawable
 
 
 class Drawable(ABC):
@@ -66,3 +67,16 @@ class Text(Drawable):
     def draw(self, painter: QPainter) -> None:
         super().draw(painter)
         painter.drawText(self.x, self.y, self.text)
+
+
+class Image(Drawable):
+    def __init__(self, x: int, y: int, img, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.x = x
+        self.y = y
+
+        h, w, _ = img.shape
+        self.img = QImage(img.copy().data, w, h, 3 * w, QImage.Format_RGB888)
+
+    def draw(self, painter: QPainter) -> None:
+        painter.drawImage(self.x, self.y, self.img)
