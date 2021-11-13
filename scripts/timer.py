@@ -5,10 +5,14 @@ from collections import deque
 
 
 class Timer:
+
+    S_TO_MS = 1000
+    GUESSED_UPDATE_TIME = 0.033  # 30FPS
+
     def __init__(self, queue_size=30) -> None:
         self.start_time = time.perf_counter()
         self.measure_start = 0.0
-        self.update_times = deque([0.33], maxlen=queue_size)
+        self.update_times = deque(maxlen=queue_size)
 
     # TODO: type hint
     @staticmethod
@@ -33,7 +37,10 @@ class Timer:
         return time.perf_counter() - self.start_time
 
     def get_avg_time(self) -> float:
-        return (sum(self.update_times) / len(self.update_times)) * 1000.0  # [ms]
+        return (sum(self.update_times) / len(self.update_times)) * Timer.S_TO_MS
+
+    def get_last_update_time(self) -> float:
+        return self.update_times[-1] if len(self.update_times) > 0 else Timer.GUESSED_UPDATE_TIME
 
     def start(self) -> None:
         self.measure_start = time.perf_counter()
