@@ -26,7 +26,7 @@ class ScriptSelector(QWidget):
         self.setWindowTitle("Please Select Script")
 
     def start(self) -> None:
-        self.selected_duration = float(self.duration_cb.currentText()) * 3600  # Hour -> second
+        self.selected_duration = float(self.duration_cb.currentText()[:-1]) * 3600  # Hour -> second
         self.selected_script = AVAILABLE_ALGOS[self.script_cb.currentText()]
 
         self.close()
