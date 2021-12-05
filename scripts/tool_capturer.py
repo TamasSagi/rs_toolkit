@@ -1,13 +1,19 @@
-from pynput import mouse
 import pyperclip
+import sys
 
 from pynput.mouse import Controller
 
-from scripts.image_handler import ImageHandler
 from scripts.keypress_listener import KeyPressListener
 from scripts.timer import Timer
 
 from gui.drawables import Line, Rect, Text, Image
+
+if sys.platform.startswith("win"):
+    from scripts.windows.screenshot_taker import ScreenshotTaker_Windows as ScreenshotTaker
+elif sys.platform.startswith("linux"):
+    from scripts.linux.screenshot_taker import ScreenshotTaker_Linux as ScreenshotTaker
+else:
+    raise ImportError("rs_toolkit does not support your system! :(")
 
 
 class ToolCapturer:
@@ -20,7 +26,7 @@ class ToolCapturer:
 
         self.timer = Timer()
         self.listener = KeyPressListener()
-        self.img_handler = ImageHandler()
+        self.screenshot_taker = ScreenshotTaker()
 
         self.init_drawables()
 
@@ -77,8 +83,8 @@ class ToolCapturer:
                 self.dragging = False
                 pyperclip.copy(str(self.drawables["mouse_drag"]))
 
-                self.img_handler.get_screenshot()
-                region = self.img_handler.get_img_region(self.drawables["mouse_drag"].get())
+                self.screenshot_taker.take_screenshot()
+                region = self.screenshot_taker.get_img_region(self.drawables["mouse_drag"].get())
 
                 h, w, _ = region.shape
                 self.drawables["alma"] = Image(100, 100, region)
