@@ -3,6 +3,7 @@ import sys
 
 from pynput.mouse import Controller
 
+from scripts.image_utils import get_img_region
 from scripts.keypress_listener import KeyPressListener
 from scripts.timer import Timer
 
@@ -22,6 +23,8 @@ class ToolCapturer:
         self.duration_s = duration_s
 
         self.dragging = False
+        self.freezed_img = None
+        self.is_screen_freezed = False
         self.mouse = Controller()
 
         self.timer = Timer()
@@ -31,6 +34,7 @@ class ToolCapturer:
         self.init_drawables()
 
     def init_drawables(self):
+        self.drawables["freezed_screen"] = Image(0, 0, is_active=False)
         self.drawables["mouse_drag"] = Rect(0, 0, 0, 0, is_active=False)
         self.drawables["mouse_drag_text"] = Text(0, 0, "", is_active=False)
 
@@ -51,6 +55,16 @@ class ToolCapturer:
         self.update_highlight()
 
     def update_highlight(self):
+        if self.listener.was_key_pressed("alt_l"):
+            self.is_screen_freezed = True
+            self.freezed_img = self.screenshot_taker.take_screenshot()
+            self.drawables["freezed_screen"] = Image(0, 23, self.freezed_img)
+
+        if not self.listener.is_key_pressed("alt_l"):
+            if self.is_screen_freezed:
+                self.is_screen_freezed = False
+                self.drawables["freezed_screen"].is_active = False
+
         if self.listener.was_key_pressed("shift"):
             self.dragging = True
             start_x, start_y = self.mouse.position
@@ -58,7 +72,6 @@ class ToolCapturer:
             self.drawables["mouse_drag"].x = start_x
             self.drawables["mouse_drag"].y = start_y
             self.drawables["mouse_drag"].is_active = True
-
             self.drawables["mouse_drag_text"].is_active = True
 
         if self.listener.is_key_pressed("shift"):
@@ -83,11 +96,16 @@ class ToolCapturer:
                 self.dragging = False
                 pyperclip.copy(str(self.drawables["mouse_drag"]))
 
-                self.screenshot_taker.take_screenshot()
-                region = self.screenshot_taker.get_img_region(self.drawables["mouse_drag"].get())
+                captured_img = (
+                    self.freezed_img
+                    if self.listener.is_key_pressed("alt_l")
+                    else self.screenshot_taker.take_screenshot()
+                )
 
-                h, w, _ = region.shape
-                self.drawables["alma"] = Image(100, 100, region)
+                image_obj = get_img_region(captured_img, self.drawables["mouse_drag"].get())
+
+                h, w, _ = image_obj.img.shape
+                self.drawables["alma"] = Image(100, 100, image_obj.img)
                 self.drawables["fing"] = Rect(100, 100, w, h)
 
             self.drawables["mouse_drag"].is_active = False
