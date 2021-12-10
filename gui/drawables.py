@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
 
 from PyQt5.QtGui import QPainter, QPen, QColor, QImage
-from Xlib.xobject import drawable
 
 
 class Drawable(ABC):
-    def __init__(self, brush: QColor = QColor(255, 0, 0, 255), is_active: bool = True, **kwargs) -> None:
-        self.pen = QPen(brush, **kwargs)
+    def __init__(self, color: tuple = (255, 0, 0, 255), is_active: bool = True, **kwargs) -> None:
+        self.pen = QPen(QColor(*color), **kwargs)
         self.is_active = is_active
 
     @abstractmethod
@@ -70,13 +69,14 @@ class Text(Drawable):
 
 
 class Image(Drawable):
-    def __init__(self, x: int, y: int, img, **kwargs) -> None:
+    def __init__(self, x: int, y: int, img=None, **kwargs) -> None:
         super().__init__(**kwargs)
         self.x = x
         self.y = y
 
-        h, w, _ = img.shape
-        self.img = QImage(img.copy().data, w, h, 3 * w, QImage.Format_RGB888)
+        if img is not None:
+            h, w, _ = img.shape
+            self.img = QImage(img.copy().data, w, h, 3 * w, QImage.Format_RGB888)
 
     def draw(self, painter: QPainter) -> None:
         painter.drawImage(self.x, self.y, self.img)
