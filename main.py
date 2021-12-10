@@ -74,7 +74,7 @@ class Controller:
 
         status_text = f"{duration} FPS: {fps:.2f}, Mem: {mem_usage:.2f}MB, algo: {algo_dur:.2f}ms gui: {gui_dur:.2f}ms"
 
-        self.drawables["status"] = Text(0, 10, status_text)
+        self.drawables["status"] = Text(100, 15, status_text, color=(0, 0, 0, 255))
 
 
 if __name__ == "__main__":
