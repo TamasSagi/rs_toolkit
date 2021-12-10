@@ -19,7 +19,6 @@ class ScreenshotTaker_Windows(ScreenshotTaker):
         left, top, right, bottom = win32gui.GetWindowRect(self.hwnd)
         self.h = bottom - top
         self.w = right - left
-        self.offset_y = 31
         self.shape = (self.h, self.w, 4)
         self.border = (slice(31, -8), slice(8, -8), slice(0, 3))
         self.rgb = (slice(None, None, None), slice(None, None, None), slice(None, None, -1))
@@ -32,7 +31,7 @@ class ScreenshotTaker_Windows(ScreenshotTaker):
         self.bitmap.CreateCompatibleBitmap(self.window_device_context, self.w, self.h)
         self.compatible_dc.SelectObject(self.bitmap)
 
-    def take_screenshot(self, debug: bool = False) -> None:
+    def take_screenshot(self, debug: bool = False) -> np.array:
         self.compatible_dc.BitBlt((0, 0), (self.w, self.h), self.window_device_context, (0, 0), win32con.SRCCOPY)
 
         # Create a numpy array from the bitmap, convert from RGBA to RGB and remove "border" from the image
@@ -40,6 +39,8 @@ class ScreenshotTaker_Windows(ScreenshotTaker):
 
         if debug:
             cv2.imwrite("frame.png", self.frame)
+
+        return self.frame
 
     def __del__(self):
         # Free win32 magic variables
